@@ -23,12 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.huertabeja.R
+import coil.compose.rememberAsyncImagePainter
+import com.example.huertabeja.data.DataSource
 import com.example.huertabeja.data.Product
 import com.example.huertabeja.navigation.AppScreens
 import java.text.NumberFormat
@@ -36,11 +36,8 @@ import java.util.Locale
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    val products = listOf(
-        Product(1, "Miel de Abeja", "Miel pura y natural", 25000.0, 10, "Miel", ""),
-        Product(2, "Polen de Abeja", "Polen fresco y nutritivo", 30000.0, 15, "Polen", ""),
-        Product(3, "Jalea Real", "Jalea real fresca", 50000.0, 5, "Jalea Real", "")
-    )
+    // Tomamos los primeros 3 productos de la fuente de datos real como destacados
+    val products = DataSource.products.take(3)
 
     Column(
         modifier = Modifier
@@ -110,7 +107,7 @@ private fun ProductCard(product: Product, onClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
+                painter = rememberAsyncImagePainter(model = product.imageUri),
                 contentDescription = "Imagen de ${product.name}",
                 modifier = Modifier
                     .height(120.dp)
