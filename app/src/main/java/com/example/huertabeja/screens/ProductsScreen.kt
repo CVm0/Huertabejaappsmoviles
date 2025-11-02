@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,6 +20,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.huertabeja.data.DataSource
 import com.example.huertabeja.data.Product
 import com.example.huertabeja.viewmodel.CartViewModel
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,89 +40,67 @@ fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel) {
             when (selectedSortOption) {
                 "Precio" -> compareBy { it.price }
                 "Stock" -> compareBy { it.stock }
-                "Nombre" -> compareBy { it.name }
                 else -> compareBy { it.name }
             }
         )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Nuestros Productos") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
-                ),
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // Search Bar
+        TextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            label = { Text("Buscar producto...") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Sorting Dropdown
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
         ) {
-            // Search Bar
             TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                label = { Text("Buscar producto...") },
-                modifier = Modifier.fillMaxWidth()
+                value = selectedSortOption,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Ordenar por") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor().fillMaxWidth()
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Sorting Dropdown
-            ExposedDropdownMenuBox(
+            ExposedDropdownMenu(
                 expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
+                onDismissRequest = { expanded = false }
             ) {
-                TextField(
-                    value = selectedSortOption,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Ordenar por") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    sortOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option) },
-                            onClick = {
-                                selectedSortOption = option
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(items = filteredAndSortedProducts, key = { it.id }) { product ->
-                    ProductCard(
-                        product = product,
-                        onAddToCart = { cartViewModel.addProduct(product) },
-                        onDelete = { DataSource.deleteProduct(product) }
+                sortOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            selectedSortOption = option
+                            expanded = false
+                        }
                     )
                 }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(items = filteredAndSortedProducts, key = { it.id }) { product ->
+                ProductCard(
+                    product = product,
+                    onAddToCart = { cartViewModel.addProduct(product) },
+                    onDelete = { DataSource.deleteProduct(product) }
+                )
             }
         }
     }
@@ -129,6 +108,9 @@ fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel) {
 
 @Composable
 fun ProductCard(product: Product, onAddToCart: () -> Unit, onDelete: () -> Unit) {
+    val clpFormat = NumberFormat.getCurrencyInstance(Locale("es", "CL"))
+    clpFormat.maximumFractionDigits = 0
+
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -169,7 +151,7 @@ fun ProductCard(product: Product, onAddToCart: () -> Unit, onDelete: () -> Unit)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "$%.2f".format(product.price),
+                    text = clpFormat.format(product.price),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary

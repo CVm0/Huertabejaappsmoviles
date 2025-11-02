@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,87 +42,70 @@ fun AddProductScreen(navController: NavController) {
         imageUri = uri
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Agregar Nuevo Producto") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
-                    }
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (imageUri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(imageUri),
+                contentDescription = "Imagen del producto",
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(bottom = 16.dp),
+                contentScale = ContentScale.Crop
             )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(imageUri),
-                    contentDescription = "Imagen del producto",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .padding(bottom = 16.dp),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .padding(bottom = 16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No se ha seleccionado ninguna imagen.")
-                }
-            }
-
-            Button(onClick = { imagePickerLauncher.launch("image/*") }) {
-                Text("Seleccionar Imagen")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") }, modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Descripción") }, modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = category, onValueChange = { category = it }, label = { Text("Categoría") }, modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = price, onValueChange = { price = it }, label = { Text("Precio") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = stock, onValueChange = { stock = it }, label = { Text("Stock") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = {
-                    val priceDouble = price.toDoubleOrNull()
-                    val stockInt = stock.toIntOrNull()
-
-                    if (name.isNotBlank() && description.isNotBlank() && category.isNotBlank() && priceDouble != null && stockInt != null && imageUri != null) {
-                        val finalImageUri = saveImageToInternalStorage(context, imageUri!!)
-                        if (finalImageUri != null) {
-                            DataSource.addProduct(name, description, priceDouble, stockInt, category, finalImageUri.toString())
-                            Toast.makeText(context, "Producto agregado", Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
-                        } else {
-                            Toast.makeText(context, "Error al guardar la imagen", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Toast.makeText(context, "Rellena todos los campos, incluida la imagen", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(bottom = 16.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text("Guardar Producto")
+                Text("No se ha seleccionado ninguna imagen.")
             }
+        }
+
+        Button(onClick = { imagePickerLauncher.launch("image/*") }) {
+            Text("Seleccionar Imagen")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Descripción") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = category, onValueChange = { category = it }, label = { Text("Categoría") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = price, onValueChange = { price = it }, label = { Text("Precio") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = stock, onValueChange = { stock = it }, label = { Text("Stock") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = {
+                val priceDouble = price.toDoubleOrNull()
+                val stockInt = stock.toIntOrNull()
+
+                if (name.isNotBlank() && description.isNotBlank() && category.isNotBlank() && priceDouble != null && stockInt != null && imageUri != null) {
+                    val finalImageUri = saveImageToInternalStorage(context, imageUri!!)
+                    if (finalImageUri != null) {
+                        DataSource.addProduct(name, description, priceDouble, stockInt, category, finalImageUri.toString())
+                        Toast.makeText(context, "Producto agregado", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    } else {
+                        Toast.makeText(context, "Error al guardar la imagen", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(context, "Rellena todos los campos, incluida la imagen", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Guardar Producto")
         }
     }
 }

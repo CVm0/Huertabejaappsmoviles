@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
@@ -25,30 +24,17 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.huertabeja.data.Product
 import com.example.huertabeja.viewmodel.CartViewModel
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
     val uiState by cartViewModel.uiState.collectAsState()
+    val clpFormat = NumberFormat.getCurrencyInstance(Locale("es", "CL"))
+    clpFormat.maximumFractionDigits = 0
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Carrito de Compras") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
-                ),
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
-                    }
-                }
-            )
-        },
         bottomBar = {
             if (uiState.products.isNotEmpty()) {
                 BottomAppBar(
@@ -62,7 +48,7 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Total: $%.2f".format(uiState.totalPrice),
+                            text = "Total: ${clpFormat.format(uiState.totalPrice)}",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -113,6 +99,9 @@ fun CartItem(
     onDecrease: () -> Unit,
     onRemoveFromCart: () -> Unit
 ) {
+    val clpFormat = NumberFormat.getCurrencyInstance(Locale("es", "CL"))
+    clpFormat.maximumFractionDigits = 0
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -126,16 +115,16 @@ fun CartItem(
                 contentDescription = product.name,
                 modifier = Modifier
                     .size(64.dp)
-                    .clip(CircleShape), 
+                    .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(product.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text("Subtotal: $%.2f".format(product.price * quantity), fontSize = 16.sp)
+                Text("Subtotal: ${clpFormat.format(product.price * quantity)}", fontSize = 16.sp)
             }
-            
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onDecrease) {
                     Icon(Icons.Filled.Remove, contentDescription = "Disminuir cantidad")
