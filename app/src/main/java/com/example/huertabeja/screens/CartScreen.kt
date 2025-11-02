@@ -1,8 +1,10 @@
 package com.example.huertabeja.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -14,10 +16,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import com.example.huertabeja.data.Product
 import com.example.huertabeja.viewmodel.CartViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,7 +107,7 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
 
 @Composable
 fun CartItem(
-    product: com.example.huertabeja.data.Product,
+    product: Product,
     quantity: Int,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
@@ -112,24 +118,34 @@ fun CartItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Image(
+                painter = rememberAsyncImagePainter(model = product.imageUri),
+                contentDescription = product.name,
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape), 
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+
             Column(modifier = Modifier.weight(1f)) {
-                Text(product.name, fontWeight = FontWeight.Bold)
-                Text("Precio: $%.2f".format(product.price))
-                Text("Subtotal: $%.2f".format(product.price * quantity))
+                Text(product.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Subtotal: $%.2f".format(product.price * quantity), fontSize = 16.sp)
             }
+            
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onDecrease) {
                     Icon(Icons.Filled.Remove, contentDescription = "Disminuir cantidad")
                 }
-                Text(text = quantity.toString(), modifier = Modifier.padding(horizontal = 8.dp))
+                Text(text = quantity.toString(), modifier = Modifier.padding(horizontal = 8.dp), fontSize = 18.sp)
                 IconButton(onClick = onIncrease) {
                     Icon(Icons.Filled.Add, contentDescription = "Aumentar cantidad")
                 }
                 IconButton(onClick = onRemoveFromCart) {
-                    Icon(Icons.Filled.Delete, contentDescription = "Eliminar producto del carrito")
+                    Icon(Icons.Filled.Delete, contentDescription = "Eliminar producto", tint = MaterialTheme.colorScheme.error)
                 }
             }
         }

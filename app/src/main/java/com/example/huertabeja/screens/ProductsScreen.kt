@@ -2,21 +2,22 @@ package com.example.huertabeja.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete // ¡IMPORTANTE! Importar icono de eliminar
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.huertabeja.data.DataSource
 import com.example.huertabeja.data.Product
 import com.example.huertabeja.viewmodel.CartViewModel
@@ -24,8 +25,24 @@ import com.example.huertabeja.viewmodel.CartViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel) {
-    // La lista ahora se obtiene directamente de DataSource y se actualizará sola
     val productList = DataSource.products
+    var searchQuery by remember { mutableStateOf("") }
+    val sortOptions = listOf("Nombre", "Precio", "Stock")
+    var selectedSortOption by remember { mutableStateOf(sortOptions[0]) }
+    var expanded by remember { mutableStateOf(false) }
+
+    val filteredAndSortedProducts = productList
+        .filter {
+            it.name.contains(searchQuery, ignoreCase = true) || it.description.contains(searchQuery, ignoreCase = true)
+        }
+        .sortedWith(
+            when (selectedSortOption) {
+                "Precio" -> compareBy { it.price }
+                "Stock" -> compareBy { it.stock }
+                "Nombre" -> compareBy { it.name }
+                else -> compareBy { it.name }
+            }
+        )
 
     Scaffold(
         topBar = {
@@ -46,44 +63,85 @@ fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel) {
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(16.dp)
         ) {
-            // Usamos la clave `key` para mejorar el rendimiento de LazyColumn al eliminar elementos
-            items(items = productList, key = { it.id }) { product ->
-                ProductCard(
-                    product = product,
-                    onAddToCart = { cartViewModel.addProduct(product) },
-                    // Pasamos la función de eliminar al ProductCard
-                    onDelete = { DataSource.deleteProduct(product) }
+            // Search Bar
+            TextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Buscar producto...") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Sorting Dropdown
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+            ) {
+                TextField(
+                    value = selectedSortOption,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Ordenar por") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
                 )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    sortOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                selectedSortOption = option
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(items = filteredAndSortedProducts, key = { it.id }) { product ->
+                    ProductCard(
+                        product = product,
+                        onAddToCart = { cartViewModel.addProduct(product) },
+                        onDelete = { DataSource.deleteProduct(product) }
+                    )
+                }
             }
         }
     }
 }
 
-// CAMBIO: Añadimos un nuevo parámetro `onDelete` a ProductCard
 @Composable
 fun ProductCard(product: Product, onAddToCart: () -> Unit, onDelete: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
             Image(
-                painter = painterResource(id = product.imageRes),
+                painter = rememberAsyncImagePainter(model = product.imageUri),
                 contentDescription = product.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
+                    .height(120.dp),
                 contentScale = ContentScale.Crop
             )
             Column(modifier = Modifier.padding(16.dp)) {
-                // CAMBIO: Fila para el título y el botón de eliminar
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -93,14 +151,13 @@ fun ProductCard(product: Product, onAddToCart: () -> Unit, onDelete: () -> Unit)
                         text = product.name,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f) // Permite que el texto ocupe el espacio disponible
+                        modifier = Modifier.weight(1f)
                     )
-                    // Botón para eliminar
                     IconButton(onClick = onDelete) {
                         Icon(
-                            imageVector = Icons.Default.Delete,
+                            imageVector = Icons.Filled.Delete,
                             contentDescription = "Eliminar Producto",
-                            tint = MaterialTheme.colorScheme.error // Color rojo para indicar peligro
+                            tint = MaterialTheme.colorScheme.error
                         )
                     }
                 }
@@ -112,7 +169,7 @@ fun ProductCard(product: Product, onAddToCart: () -> Unit, onDelete: () -> Unit)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "$${"%.2f".format(product.price)}",
+                    text = "$%.2f".format(product.price),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary

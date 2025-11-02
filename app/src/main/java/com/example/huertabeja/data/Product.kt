@@ -1,7 +1,5 @@
 package com.example.huertabeja.data
 
-import androidx.annotation.DrawableRes
-
 data class Product(
     val id: Int,
     val name: String,
@@ -9,5 +7,5 @@ data class Product(
     val price: Double,
     val stock: Int,
     val category: String,
-    @DrawableRes val imageRes: Int
+    val imageUri: String
 )
