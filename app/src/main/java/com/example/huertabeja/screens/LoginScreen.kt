@@ -1,6 +1,7 @@
 package com.example.huertabeja.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -34,8 +35,14 @@ import com.example.huertabeja.R
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .background(color = Color(0xFFFBF8F0))
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
@@ -47,9 +54,33 @@ fun LoginScreen(navController: NavController) {
             alignment = Alignment.BottomEnd
         )
         Spacer(modifier = Modifier.height(16.dp))
-        customOutlinedTextField(labelText = "Usuario", icon = Icons.Default.Email)
+        customOutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            labelText = "Usuario",
+            icon = Icons.Default.Email
+        )
         Spacer(modifier = Modifier.height(16.dp))
-        customOutlinedTextField(labelText = "Contraseña", icon = Icons.Default.Lock, isPassword = true)
+        customOutlinedTextField(
+            value = password,
+            onValueChange = {
+                password = it
+                passwordError = null // Clear error on change
+            },
+            labelText = "Contraseña",
+            icon = Icons.Default.Lock,
+            isPassword = true,
+            isError = passwordError != null
+        )
+
+        passwordError?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "¿Olvidaste tu contraseña?",
@@ -60,10 +91,20 @@ fun LoginScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(32.dp))
         Button(
-            onClick = { navController.popBackStack() },
+            onClick = {
+                val specialCharRegex = Regex("[^A-Za-z0-9]")
+                if (password.length < 8 || password.length > 12) {
+                    passwordError = "La contraseña debe tener entre 8 y 12 caracteres."
+                } else if (!specialCharRegex.containsMatchIn(password)) {
+                    passwordError = "La contraseña debe contener al menos un carácter especial."
+                } else {
+                    passwordError = null
+                    navController.popBackStack()
+                }
+            },
             modifier = Modifier.width(200.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF8DA356) // Verde claro
+                containerColor = Color(0xFF8E9B6B) // Verde claro
             )
         ) {
             Text("Iniciar sesión", color = Color.Black)
@@ -74,40 +115,41 @@ fun LoginScreen(navController: NavController) {
 
 @Composable
 fun customOutlinedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
     labelText: String,
     icon: ImageVector,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isError: Boolean = false
 ) {
-    var text by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    MaterialTheme {
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            label = { Text(labelText) },
-            leadingIcon = {
-                Icon(
-                    imageVector = icon, // <-- 2. Usar el parámetro recibido
-                    contentDescription = "$labelText icon" // Descripción de contenido dinámica
-                )
-            },
-            visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text),
-            trailingIcon = {
-                if (isPassword) {
-                    val image = if (passwordVisible)
-                        R.drawable.hide
-                    else
-                        R.drawable.visible
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(labelText) },
+        leadingIcon = {
+            Icon(
+                imageVector = icon, // <-- 2. Usar el parámetro recibido
+                contentDescription = "$labelText icon" // Descripción de contenido dinámica
+            )
+        },
+        visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text),
+        trailingIcon = {
+            if (isPassword) {
+                val image = if (passwordVisible)
+                    R.drawable.hide
+                else
+                    R.drawable.visible
 
-                    val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
 
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(painter = painterResource(id = image), contentDescription = description)
-                    }
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(painter = painterResource(id = image), contentDescription = description)
                 }
             }
-        )
-    }
+        },
+        isError = isError
+    )
 }

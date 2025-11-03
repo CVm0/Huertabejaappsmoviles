@@ -41,7 +41,7 @@ fun AboutScreen(navController: NavController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(0xFFFDF8E7))
+            .background(color = Color(0xFFFBF8F0))
             .padding(16.dp)
     ) {
 

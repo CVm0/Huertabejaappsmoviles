@@ -1,5 +1,6 @@
 package com.example.huertabeja.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -87,7 +88,8 @@ fun AppNavigation() {
         NavHost(
             navController = navController,
             startDestination = AppScreens.HomeScreen.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
         ) {
             composable(route = AppScreens.HomeScreen.route) {
                 HomeScreen(navController)
