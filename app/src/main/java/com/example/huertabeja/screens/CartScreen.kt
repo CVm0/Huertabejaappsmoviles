@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.huertabeja.data.Product
+import com.example.huertabeja.navigation.AppNavigation
+import com.example.huertabeja.navigation.AppScreens
 import com.example.huertabeja.viewmodel.CartViewModel
 import java.text.NumberFormat
 import java.util.Locale
@@ -56,7 +58,7 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
                             color = Color(0xFF424F37)
                         )
                         Button(
-                            onClick = { /* Lógica para finalizar compra */ },
+                            onClick = { navController.navigate(AppScreens.PaymentScreen.route) },
                             colors = ButtonDefaults.buttonColors(Color(0xFF4D5D41))
                         ) {
                             Text("Finalizar Compra", color = Color.White)
@@ -69,6 +71,7 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
         if (uiState.products.isEmpty()) {
             Box(
                 modifier = Modifier
+                    .background(color = Color(0xFFFBF8F0))
                     .fillMaxSize()
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center

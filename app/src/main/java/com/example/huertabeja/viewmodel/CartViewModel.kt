@@ -57,6 +57,10 @@ class CartViewModel : ViewModel() {
         }
     }
 
+    fun clearCart() {
+        _uiState.value = CartUiState()
+    }
+
     private fun calculateTotalPrice(products: Map<Product, Int>): Double {
         var totalPrice = 0.0
         for ((product, quantity) in products) {
