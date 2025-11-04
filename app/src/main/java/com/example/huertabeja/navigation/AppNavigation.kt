@@ -96,7 +96,7 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = AppScreens.HomeScreen.route,
+            startDestination = AppScreens.LoginScreen.route,
             modifier = Modifier
                 .padding(innerPadding)
         ) {
