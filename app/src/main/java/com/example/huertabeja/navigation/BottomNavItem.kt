@@ -25,7 +25,7 @@ sealed class BottomNavItem(
     object Login : BottomNavItem(
         title = "Perfil",
         icon = Icons.Default.Person,
-        route = AppScreens.LoginScreen.route
+        route = AppScreens.PerfilUserScreen.route
     )
     object About : BottomNavItem(
         title = "Nosotros",
