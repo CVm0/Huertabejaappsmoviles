@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -50,14 +51,15 @@ fun AppNavigation() {
                 TopAppBar(
                     title = { Text(screenTitle) },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary
+                        containerColor = Color(0xFF8DA356),
+                        titleContentColor = Color.White
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Volver"
+                                contentDescription = "Volver",
+                                tint = Color.White
                             )
                         }
                     }
@@ -65,7 +67,7 @@ fun AppNavigation() {
             }
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(containerColor = Color(0xFFF0F4E3)) {
                 bottomNavItems.forEach { screen ->
                     NavigationBarItem(
                         icon = { Icon(screen.icon, contentDescription = screen.title) },
@@ -79,7 +81,13 @@ fun AppNavigation() {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color(0xFF8E9B6B),
+                            unselectedIconColor = Color.Gray,
+                            selectedTextColor = Color(0xFF8E9B6B),
+                            unselectedTextColor = Color.Gray
+                        )
                     )
                 }
             }
