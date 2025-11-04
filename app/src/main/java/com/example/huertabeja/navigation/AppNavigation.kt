@@ -117,6 +117,9 @@ fun AppNavigation() {
             composable(route = AppScreens.AboutScreen.route) {
                 AboutScreen(navController)
             }
+            composable(route = AppScreens.PerfilUserScreen.route){
+                PerfilScreen(navController)
+            }
         }
     }
 }

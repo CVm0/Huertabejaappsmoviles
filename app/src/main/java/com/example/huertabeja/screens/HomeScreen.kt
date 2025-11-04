@@ -83,8 +83,8 @@ fun HomeScreen(navController: NavController) {
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { navController.navigate(AppScreens.LoginScreen.route) }) {
-            Text("Perfil / Iniciar Sesión")
+        Button(onClick = { navController.navigate(AppScreens.PerfilUserScreen.route) }) {
+            Text("Perfil")
         }
         Spacer(modifier = Modifier.height(16.dp))
 
