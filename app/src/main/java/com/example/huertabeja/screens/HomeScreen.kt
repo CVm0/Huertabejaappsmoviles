@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.huertabeja.data.BannerData
+import com.example.huertabeja.data.CategoryData
 import com.example.huertabeja.data.DataSource
 import com.example.huertabeja.data.Product
 import com.example.huertabeja.navigation.AppScreens
@@ -37,7 +39,13 @@ import java.util.Locale
 @Composable
 fun HomeScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("Todas") }
     val products = DataSource.products
+
+    val filteredProducts = products.filter { product ->
+        (selectedCategory == "Todas" || product.category == selectedCategory) &&
+                product.name.contains(searchQuery, ignoreCase = true)
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -78,7 +86,10 @@ fun HomeScreen(navController: NavController) {
         }
 
         item {
-            CategoriesSection(navController = navController)
+            CategoriesSection(
+                selectedCategory = selectedCategory,
+                onCategorySelected = { selectedCategory = it }
+            )
         }
 
         // Productos Destacados
@@ -117,11 +128,11 @@ fun HomeScreen(navController: NavController) {
             )
         }
 
-        // Listado resumido de todos los productos
+        // Listado de productos (filtrado)
         item {
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "Todos los Productos",
+                text = if (selectedCategory == "Todas") "Todos los Productos" else selectedCategory,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF3C4522),
@@ -130,15 +141,28 @@ fun HomeScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        items(products) { product ->
-            ProductListItem(
-                product = product,
-                onClick = {
-                    // TODO: Navigate to product detail screen
-                    navController.navigate(AppScreens.ProductsScreen.route)
-                },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-            )
+        if (filteredProducts.isEmpty()) {
+            item {
+                Text(
+                    text = "No se encontraron productos en esta categoría.",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray
+                )
+            }
+        } else {
+            items(filteredProducts) { product ->
+                ProductListItem(
+                    product = product,
+                    onClick = {
+                        // TODO: Navigate to product detail screen
+                        navController.navigate(AppScreens.ProductsScreen.route)
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+            }
         }
 
         item {
@@ -183,7 +207,7 @@ private fun BannerCarousel(
     modifier: Modifier = Modifier
 ) {
     val banners = listOf(
-        BannerData("¡Nuevos productos!", "Descubre nuestra colección", Color(0xFF758a5b)),
+        BannerData("¡Nuevos productos!", "Descubre nuestra colección", Color(0xFF8DA356)),
         BannerData("Ofertas Especiales", "Hasta 30% de descuento", Color(0xFF8E9B6B)),
         BannerData("Huerto en Casa", "Todo lo que necesitas", Color(0xFF9CAF76))
     )
@@ -265,7 +289,10 @@ private fun BannerCard(banner: BannerData, onClick: () -> Unit) {
 }
 
 @Composable
-private fun CategoriesSection(navController: NavController) {
+private fun CategoriesSection(
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
     val categories = listOf(
         CategoryData("Aromáticas", "🌿"),
         CategoryData("Suculentas", "🌵"),
@@ -280,21 +307,25 @@ private fun CategoriesSection(navController: NavController) {
         items(categories) { category ->
             CategoryCard(
                 category = category,
-                onClick = { navController.navigate(AppScreens.ProductsScreen.route) }
+                isSelected = category.name == selectedCategory,
+                onClick = { onCategorySelected(category.name) }
             )
         }
     }
 }
 
 @Composable
-private fun CategoryCard(category: CategoryData, onClick: () -> Unit) {
+private fun CategoryCard(category: CategoryData, isSelected: Boolean, onClick: () -> Unit) {
+    val backgroundColor = if (isSelected) Color(0xFF8E9B6B) else Color.White
+    val textColor = if (isSelected) Color.White else Color(0xFF3C4522)
+
     Card(
         modifier = Modifier
             .width(100.dp)
             .height(100.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -311,7 +342,7 @@ private fun CategoryCard(category: CategoryData, onClick: () -> Unit) {
                 text = category.name,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF3C4522),
+                color = textColor,
                 textAlign = TextAlign.Center
             )
         }
@@ -433,7 +464,3 @@ private fun ProductListItem(product: Product, onClick: () -> Unit, modifier: Mod
         }
     }
 }
-
-// Data classes
-private data class BannerData(val title: String, val subtitle: String, val backgroundColor: Color)
-private data class CategoryData(val name: String, val emoji: String)

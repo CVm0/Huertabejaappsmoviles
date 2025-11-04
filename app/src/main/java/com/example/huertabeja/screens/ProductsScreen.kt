@@ -2,10 +2,13 @@ package com.example.huertabeja.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -17,10 +20,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.huertabeja.data.CategoryData
 import com.example.huertabeja.data.DataSource
 import com.example.huertabeja.data.Product
 import com.example.huertabeja.viewmodel.CartViewModel
@@ -32,13 +37,15 @@ import java.util.Locale
 fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel) {
     val productList = DataSource.products
     var searchQuery by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("Todas") }
     val sortOptions = listOf("Nombre", "Precio", "Stock")
     var selectedSortOption by remember { mutableStateOf(sortOptions[0]) }
     var expanded by remember { mutableStateOf(false) }
 
     val filteredAndSortedProducts = productList
-        .filter {
-            it.name.contains(searchQuery, ignoreCase = true) || it.description.contains(searchQuery, ignoreCase = true)
+        .filter { product ->
+            (selectedCategory == "Todas" || product.category == selectedCategory) &&
+                    (product.name.contains(searchQuery, ignoreCase = true) || product.description.contains(searchQuery, ignoreCase = true))
         }
         .sortedWith(
             when (selectedSortOption) {
@@ -94,6 +101,14 @@ fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel) {
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Categories Section
+        CategoriesSection(
+            selectedCategory = selectedCategory,
+            onCategorySelected = { selectedCategory = it }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -177,6 +192,66 @@ fun ProductCard(product: Product, onAddToCart: () -> Unit, onDelete: () -> Unit)
                     Text("Agregar al carrito", color = Color.White)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun CategoriesSection(
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
+    val categories = listOf(
+        CategoryData("Aromáticas", "🌿"),
+        CategoryData("Suculentas", "🌵"),
+        CategoryData("Huerto", "🍅"),
+        CategoryData("Todas", "🛒")
+    )
+
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(categories) { category ->
+            CategoryCard(
+                category = category,
+                isSelected = category.name == selectedCategory,
+                onClick = { onCategorySelected(category.name) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryCard(category: CategoryData, isSelected: Boolean, onClick: () -> Unit) {
+    val backgroundColor = if (isSelected) Color(0xFF8E9B6B) else Color.White
+    val textColor = if (isSelected) Color.White else Color(0xFF3C4522)
+
+    Card(
+        modifier = Modifier
+            .width(100.dp)
+            .height(100.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = category.emoji,
+                fontSize = 36.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = category.name,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = textColor,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
