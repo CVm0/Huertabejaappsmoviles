@@ -1,6 +1,7 @@
 package com.example.huertabeja.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ fun HomeScreen(navController: NavController) {
 
     Column(
         modifier = Modifier
+            .background(color = Color(0xFFFBF8F0))
             .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(rememberScrollState()),
@@ -81,8 +83,8 @@ fun HomeScreen(navController: NavController) {
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { navController.navigate(AppScreens.LoginScreen.route) }) {
-            Text("Perfil / Iniciar Sesión")
+        Button(onClick = { navController.navigate(AppScreens.PerfilUserScreen.route) }) {
+            Text("Perfil")
         }
         Spacer(modifier = Modifier.height(16.dp))
 

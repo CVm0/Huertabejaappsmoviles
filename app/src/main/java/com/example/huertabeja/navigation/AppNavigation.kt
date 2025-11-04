@@ -1,11 +1,11 @@
 package com.example.huertabeja.navigation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +24,7 @@ import com.example.huertabeja.viewmodel.CartViewModel
 fun AppNavigation() {
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
+    val cartUiState by cartViewModel.uiState.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val currentRoute = currentDestination?.route
@@ -42,7 +43,6 @@ fun AppNavigation() {
         AppScreens.CartScreen.route -> "Carrito de Compras"
         AppScreens.AboutScreen.route -> "Sobre Nosotros"
         AppScreens.LoginScreen.route -> "Perfil"
-        AppScreens.RegisterScreen.route -> "Registro"
         else -> "Huertabeja"
     }
 
@@ -120,6 +120,16 @@ fun AppNavigation() {
             }
             composable(route = AppScreens.AboutScreen.route) {
                 AboutScreen(navController)
+            }
+            composable(route = AppScreens.PerfilUserScreen.route){
+                PerfilScreen(navController)
+            }
+            composable(route = AppScreens.PaymentScreen.route){
+                PaymentScreen(
+                    navController = navController,
+                    totalAmount = cartUiState.totalPrice,
+                    onCheckout = { cartViewModel.clearCart() }
+                )
             }
         }
     }

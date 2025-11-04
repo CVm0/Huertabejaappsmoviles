@@ -12,6 +12,8 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -225,7 +227,7 @@ fun RegisterScreen(navController: NavController) {
                 }
                 
                 // Validar email
-                val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+                val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")
                 if (email.isBlank()) {
                     emailError = "El correo electrónico es obligatorio."
                     hasError = true
@@ -235,7 +237,7 @@ fun RegisterScreen(navController: NavController) {
                 }
                 
                 // Validar teléfono
-                val phoneRegex = Regex("^[0-9]{9,12}$")
+                val phoneRegex = Regex("^[0-9]{9,12}\$")
                 if (phone.isBlank()) {
                     phoneError = "El teléfono es obligatorio."
                     hasError = true
@@ -326,7 +328,7 @@ fun RegisterOutlinedTextField(
         leadingIcon = {
             Icon(
                 imageVector = icon,
-                contentDescription = "$labelText icon"
+                contentDescription = "\$labelText icon"
             )
         },
         visualTransformation = if (isPassword && !passwordVisible) 
@@ -339,14 +341,13 @@ fun RegisterOutlinedTextField(
         trailingIcon = {
             if (isPassword) {
                 val image = if (passwordVisible)
-                    R.drawable.hide
+                    Icons.Filled.Visibility
                 else
-                    R.drawable.visible
-
+                    Icons.Filled.VisibilityOff
                 val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
 
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(painter = painterResource(id = image), contentDescription = description)
+                    Icon(imageVector = image, contentDescription = description)
                 }
             }
         },

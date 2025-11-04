@@ -32,7 +32,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.huertabeja.R
-import androidx.compose.ui.text.font.FontWeight
+import com.example.huertabeja.navigation.AppScreens
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -111,7 +111,7 @@ fun LoginScreen(navController: NavController) {
             Text("Iniciar sesión", color = Color.Black)
         }
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         // Link para ir a Registro
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -125,11 +125,11 @@ fun LoginScreen(navController: NavController) {
                 text = "Regístrate",
                 color = Color(0xFF8E9B6B),
                 modifier = Modifier.clickable {
-                    navController.navigate("register_screen")
+                    navController.navigate(AppScreens.RegisterScreen.route)
                 }
             )
         }
-        
+
         Spacer(modifier = Modifier.weight(2.5f))
     }
 }

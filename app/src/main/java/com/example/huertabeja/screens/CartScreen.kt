@@ -1,6 +1,7 @@
 package com.example.huertabeja.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.huertabeja.data.Product
+import com.example.huertabeja.navigation.AppNavigation
+import com.example.huertabeja.navigation.AppScreens
 import com.example.huertabeja.viewmodel.CartViewModel
 import java.text.NumberFormat
 import java.util.Locale
@@ -38,7 +42,7 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
         bottomBar = {
             if (uiState.products.isNotEmpty()) {
                 BottomAppBar(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                    containerColor = Color(0xFFD6DCC2)
                 ) {
                     Row(
                         modifier = Modifier
@@ -50,10 +54,14 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
                         Text(
                             text = "Total: ${clpFormat.format(uiState.totalPrice)}",
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF424F37)
                         )
-                        Button(onClick = { /* Lógica para finalizar compra */ }) {
-                            Text("Finalizar Compra")
+                        Button(
+                            onClick = { navController.navigate(AppScreens.PaymentScreen.route) },
+                            colors = ButtonDefaults.buttonColors(Color(0xFF4D5D41))
+                        ) {
+                            Text("Finalizar Compra", color = Color.White)
                         }
                     }
                 }
@@ -63,6 +71,7 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
         if (uiState.products.isEmpty()) {
             Box(
                 modifier = Modifier
+                    .background(color = Color(0xFFFBF8F0))
                     .fillMaxSize()
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
@@ -134,7 +143,7 @@ fun CartItem(
                     Icon(Icons.Filled.Add, contentDescription = "Aumentar cantidad")
                 }
                 IconButton(onClick = onRemoveFromCart) {
-                    Icon(Icons.Filled.Delete, contentDescription = "Eliminar producto", tint = MaterialTheme.colorScheme.error)
+                    Icon(Icons.Filled.Delete, contentDescription = "Eliminar producto", tint = Color(0x81FF0000))
                 }
             }
         }
