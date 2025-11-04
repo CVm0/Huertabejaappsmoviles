@@ -1,6 +1,7 @@
 package com.example.huertabeja.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +48,7 @@ fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel) {
 
     Column(
         modifier = Modifier
+            .background(color = Color(0xFFFBF8F0))
             .fillMaxSize()
             .padding(16.dp)
     ) {
@@ -139,7 +142,7 @@ fun ProductCard(product: Product, onAddToCart: () -> Unit, onDelete: () -> Unit)
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = "Eliminar Producto",
-                            tint = MaterialTheme.colorScheme.error
+                            tint = Color(0x81FF0000)
                         )
                     }
                 }
@@ -159,9 +162,12 @@ fun ProductCard(product: Product, onAddToCart: () -> Unit, onDelete: () -> Unit)
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = onAddToCart,
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF8DA356)
+                    )
                 ) {
-                    Text("Agregar al carrito")
+                    Text("Agregar al carrito", color = Color.White)
                 }
             }
         }
