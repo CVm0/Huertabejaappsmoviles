@@ -49,7 +49,7 @@ fun AboutScreen(navController: NavController) {
         item {
             SectionTitle(title = "Nuestra Misión")
             Text(
-                text = "Aquí va el texto que describe la misión de Huertabeja. Queremos conectar a las personas con la naturaleza a través de la apicultura y la horticultura sostenible, promoviendo la biodiversidad y el respeto por el medio ambiente.",
+                text = "Queremos conectar a las personas con la naturaleza a través de la apicultura y la horticultura sostenible, promoviendo la biodiversidad y el respeto por el medio ambiente.",
                 style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -59,7 +59,7 @@ fun AboutScreen(navController: NavController) {
         item {
             SectionTitle(title = "Nuestra Historia")
             Text(
-                text = "Aquí se narra la historia de cómo comenzó el proyecto Huertabeja. Desde la idea inicial hasta los hitos más importantes que hemos alcanzado como comunidad.",
+                text = "Aquí iría un texto sobre nuestra historia, si tan solo tuviéramos una historia",
                 style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -70,9 +70,8 @@ fun AboutScreen(navController: NavController) {
             SectionTitle(title = "Nuestro Equipo")
         }
         item {
-            // Suponiendo que tienes una lista de miembros del equipo
             val teamMembers = listOf(
-                "Ana García", "Carlos Pérez", "Sofía López"
+                "Matias Cristi", "Carlos Donoso", "Camilo Carrasco"
             )
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -81,16 +80,14 @@ fun AboutScreen(navController: NavController) {
                     TeamMemberAvatar(name = memberName)
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         // -- Sección Contacto --
         item {
             SectionTitle(title = "Contacto")
             ContactInfo(icon = Icons.Default.Email, text = "contacto@huertabeja.com")
-            ContactInfo(icon = Icons.Default.Phone, text = "+34 123 456 789")
-            // Aquí podrías añadir iconos de redes sociales
-            Spacer(modifier = Modifier.height(16.dp))
+            ContactInfo(icon = Icons.Default.Phone, text = "+56 9 1234 5678")
         }
     }
 }
@@ -112,7 +109,7 @@ fun TeamMemberAvatar(name: String) {
         modifier = Modifier.width(100.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background), // Reemplaza con una imagen genérica o específica
+            painter = painterResource(id = R.drawable.emoji), // Reemplaza con una imagen genérica o específica
             contentDescription = "Avatar de $name",
             contentScale = ContentScale.Crop,
             modifier = Modifier

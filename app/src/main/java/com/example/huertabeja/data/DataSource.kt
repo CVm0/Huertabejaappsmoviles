@@ -9,7 +9,7 @@ object DataSource {
             id = 1,
             name = "Lavanda",
             description = "Planta aromática con flores moradas, ideal para relajación.",
-            price = 12.000,
+            price = 12000.0,
             stock = 15,
             category = "Aromáticas",
             imageUri = "android.resource://com.example.huertabeja/" + R.drawable.lavanda
@@ -18,7 +18,7 @@ object DataSource {
             id = 2,
             name = "Suculenta Jade",
             description = "Planta de interior resistente, con hojas carnosas y verdes.",
-            price = 80.000,
+            price = 8000.0,
             stock = 30,
             category = "Suculentas",
             imageUri = "android.resource://com.example.huertabeja/" + R.drawable.suculenta_jade
@@ -27,7 +27,7 @@ object DataSource {
             id = 3,
             name = "Tomate Cherry",
             description = "Planta de huerto que produce pequeños y dulces tomates.",
-            price = 5.750,
+            price = 5750.0,
             stock = 25,
             category = "Huerto",
             imageUri = "android.resource://com.example.huertabeja/" + R.drawable.tomate_cherry
