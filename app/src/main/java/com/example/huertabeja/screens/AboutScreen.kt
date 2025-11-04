@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Phone
@@ -42,6 +43,9 @@ fun AboutScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color(0xFFFBF8F0))
+            .padding(16.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(color = Color(0xFFDED8CA))
             .padding(16.dp)
     ) {
 
