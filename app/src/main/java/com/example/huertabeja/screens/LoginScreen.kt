@@ -100,7 +100,7 @@ fun LoginScreen(navController: NavController) {
                     passwordError = "La contraseña debe contener al menos un carácter especial."
                 } else {
                     passwordError = null
-                    navController.popBackStack()
+                    navController.navigate(AppScreens.HomeScreen.route)
                 }
             },
             modifier = Modifier.width(200.dp),
