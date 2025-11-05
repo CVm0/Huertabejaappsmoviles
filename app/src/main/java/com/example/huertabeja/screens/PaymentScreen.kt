@@ -71,7 +71,7 @@ fun PaymentScreen(navController: NavController, totalAmount: Double, onCheckout:
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Total a pagar: ${String.format("$%.2f", totalAmount)}",
+            text = "Subtotal: ${String.format("$%.2f", totalAmount)}",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
@@ -81,7 +81,7 @@ fun PaymentScreen(navController: NavController, totalAmount: Double, onCheckout:
         Button(
             onClick = {
                 onCheckout()
-                navController.popBackStack() // Vuelve a la pantalla anterior
+                navController.popBackStack()
             },
             enabled = isFormComplete,
             modifier = Modifier

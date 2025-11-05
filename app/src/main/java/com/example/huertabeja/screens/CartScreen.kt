@@ -52,7 +52,7 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Total: ${clpFormat.format(uiState.totalPrice)}",
+                            text = "Subtotal: ${clpFormat.format(uiState.totalPrice)}",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF424F37)

@@ -26,7 +26,6 @@ import com.example.huertabeja.navigation.AppScreens
 
 @Composable
 fun PerfilScreen(navController: NavController) {
-    // Datos de ejemplo para el perfil de usuario
     val userName = "Carlos"
     val userEmail = "carlos@example.com"
     val registrationDate = "Miembro desde: 01/01/2024"
@@ -73,20 +72,30 @@ fun PerfilScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Fecha de registro
         Text(
             text = registrationDate,
             fontSize = 16.sp,
             color = Color.Gray
         )
 
-        Spacer(modifier = Modifier.weight(1f)) // Empuja el botón de cierre de sesión hacia abajo
+        Spacer(modifier = Modifier.weight(1f))
 
+        Button(
+            onClick = { navController.navigate(AppScreens.AddProductScreen.route) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp)
+        ) {
+            Text("Añadir Producto", color = Color.White)
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
         // Botón de Cerrar Sesión
         Button(
             onClick = {
-                // Lógica de cierre de sesión
-                // Navega a la pantalla de inicio y limpia la pila de navegación
                 navController.navigate(AppScreens.LoginScreen.route) {
                     popUpTo(navController.graph.findStartDestination().id) {
                         inclusive = true
