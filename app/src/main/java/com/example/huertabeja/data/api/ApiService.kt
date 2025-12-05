@@ -35,6 +35,9 @@ interface UserApiService {
     
     @GET("users/{id}")
     suspend fun getUserById(@Path("id") userId: String): Response<User>
+    
+    @POST("users")
+    suspend fun registerUser(@Body userRegisterRequest: com.example.huertabeja.data.model.UserRegisterRequest): Response<User>
 }
 
 // Interface específica para productos y pedidos

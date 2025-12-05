@@ -14,14 +14,19 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,22 +42,56 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.huertabeja.R
+import com.example.huertabeja.viewmodel.RegisterState
+import com.example.huertabeja.viewmodel.RegisterViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController) {
-    var fullName by remember { mutableStateOf("") }
+fun RegisterScreen(
+    navController: NavController,
+    viewModel: RegisterViewModel = viewModel()
+) {
+    var run by remember { mutableStateOf("") }
+    var dv by remember { mutableStateOf("") }
+    var nombres by remember { mutableStateOf("") }
+    var apellidos by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     
-    var fullNameError by remember { mutableStateOf<String?>(null) }
+    var runError by remember { mutableStateOf<String?>(null) }
+    var dvError by remember { mutableStateOf<String?>(null) }
+    var nombresError by remember { mutableStateOf<String?>(null) }
+    var apellidosError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
-    var phoneError by remember { mutableStateOf<String?>(null) }
+    var telefonoError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
     var confirmPasswordError by remember { mutableStateOf<String?>(null) }
+    
+    val registerState by viewModel.registerState.collectAsState()
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isSuccess by remember { mutableStateOf(false) }
+    
+    // Observe register state
+    LaunchedEffect(registerState) {
+        when (registerState) {
+            is RegisterState.Success -> {
+                dialogMessage = (registerState as RegisterState.Success).message
+                isSuccess = true
+                showDialog = true
+            }
+            is RegisterState.Error -> {
+                dialogMessage = (registerState as RegisterState.Error).message
+                isSuccess = false
+                showDialog = true
+            }
+            else -> {}
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -83,19 +122,107 @@ fun RegisterScreen(navController: NavController) {
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        // Campo Nombre Completo
+        // Fila para RUN y DV
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            // Campo RUN
+            Column(modifier = Modifier.weight(0.6f)) {
+                RegisterOutlinedTextField(
+                    value = run,
+                    onValueChange = {
+                        // Solo permitir números
+                        if (it.all { char -> char.isDigit() } && it.length <= 8) {
+                            run = it
+                            runError = null
+                        }
+                    },
+                    labelText = "Run",
+                    icon = Icons.Default.Person,
+                    keyboardType = KeyboardType.Number,
+                    isError = runError != null
+                )
+                
+                runError?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                    )
+                }
+            }
+            
+            // Campo DV
+            Column(modifier = Modifier.weight(0.4f)) {
+                RegisterOutlinedTextField(
+                    value = dv,
+                    onValueChange = {
+                        // Permitir números y K/k
+                        if (it.length <= 1 && (it.all { char -> char.isDigit() } || it.equals("K", ignoreCase = true))) {
+                            dv = it.uppercase()
+                            dvError = null
+                        }
+                    },
+                    labelText = "Dv",
+                    icon = Icons.Default.Person,
+                    keyboardType = KeyboardType.Text,
+                    isError = dvError != null
+                )
+                
+                dvError?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                    )
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Campo Nombres
         RegisterOutlinedTextField(
-            value = fullName,
+            value = nombres,
             onValueChange = {
-                fullName = it
-                fullNameError = null
+                nombres = it
+                nombresError = null
             },
-            labelText = "Nombre Completo",
+            labelText = "Nombres",
             icon = Icons.Default.Person,
-            isError = fullNameError != null
+            isError = nombresError != null
         )
         
-        fullNameError?.let {
+        nombresError?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, top = 4.dp)
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Campo Apellidos
+        RegisterOutlinedTextField(
+            value = apellidos,
+            onValueChange = {
+                apellidos = it
+                apellidosError = null
+            },
+            labelText = "Apellidos",
+            icon = Icons.Default.Person,
+            isError = apellidosError != null
+        )
+        
+        apellidosError?.let {
             Text(
                 text = it,
                 color = MaterialTheme.colorScheme.error,
@@ -115,7 +242,7 @@ fun RegisterScreen(navController: NavController) {
                 email = it
                 emailError = null
             },
-            labelText = "Correo Electrónico",
+            labelText = "Email",
             icon = Icons.Default.Email,
             keyboardType = KeyboardType.Email,
             isError = emailError != null
@@ -136,18 +263,21 @@ fun RegisterScreen(navController: NavController) {
         
         // Campo Teléfono
         RegisterOutlinedTextField(
-            value = phone,
+            value = telefono,
             onValueChange = {
-                phone = it
-                phoneError = null
+                // Solo permitir números
+                if (it.all { char -> char.isDigit() } && it.length <= 12) {
+                    telefono = it
+                    telefonoError = null
+                }
             },
             labelText = "Teléfono",
             icon = Icons.Default.Phone,
             keyboardType = KeyboardType.Phone,
-            isError = phoneError != null
+            isError = telefonoError != null
         )
         
-        phoneError?.let {
+        telefonoError?.let {
             Text(
                 text = it,
                 color = MaterialTheme.colorScheme.error,
@@ -186,14 +316,14 @@ fun RegisterScreen(navController: NavController) {
         
         Spacer(modifier = Modifier.height(12.dp))
         
-        // Campo Confirmar Contraseña
+        // Campo Verificar Contraseña
         RegisterOutlinedTextField(
             value = confirmPassword,
             onValueChange = {
                 confirmPassword = it
                 confirmPasswordError = null
             },
-            labelText = "Confirmar Contraseña",
+            labelText = "Verificar Contraseña",
             icon = Icons.Default.Lock,
             isPassword = true,
             isError = confirmPasswordError != null
@@ -217,32 +347,55 @@ fun RegisterScreen(navController: NavController) {
             onClick = {
                 var hasError = false
                 
-                // Validar nombre completo
-                if (fullName.isBlank()) {
-                    fullNameError = "El nombre es obligatorio."
+                // Validar RUN
+                if (run.isBlank()) {
+                    runError = "El RUN es obligatorio."
                     hasError = true
-                } else if (fullName.length < 3) {
-                    fullNameError = "El nombre debe tener al menos 3 caracteres."
+                } else if (run.length < 7) {
+                    runError = "El RUN debe tener al menos 7 dígitos."
+                    hasError = true
+                }
+                
+                // Validar DV
+                if (dv.isBlank()) {
+                    dvError = "El DV es obligatorio."
+                    hasError = true
+                }
+                
+                // Validar nombres
+                if (nombres.isBlank()) {
+                    nombresError = "Los nombres son obligatorios."
+                    hasError = true
+                } else if (nombres.length < 2) {
+                    nombresError = "Los nombres deben tener al menos 2 caracteres."
+                    hasError = true
+                }
+                
+                // Validar apellidos
+                if (apellidos.isBlank()) {
+                    apellidosError = "Los apellidos son obligatorios."
+                    hasError = true
+                } else if (apellidos.length < 2) {
+                    apellidosError = "Los apellidos deben tener al menos 2 caracteres."
                     hasError = true
                 }
                 
                 // Validar email
-                val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")
+                val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
                 if (email.isBlank()) {
-                    emailError = "El correo electrónico es obligatorio."
+                    emailError = "El email es obligatorio."
                     hasError = true
                 } else if (!emailRegex.matches(email)) {
-                    emailError = "Ingresa un correo electrónico válido."
+                    emailError = "Ingresa un email válido."
                     hasError = true
                 }
                 
                 // Validar teléfono
-                val phoneRegex = Regex("^[0-9]{9,12}\$")
-                if (phone.isBlank()) {
-                    phoneError = "El teléfono es obligatorio."
+                if (telefono.isBlank()) {
+                    telefonoError = "El teléfono es obligatorio."
                     hasError = true
-                } else if (!phoneRegex.matches(phone)) {
-                    phoneError = "Ingresa un número de teléfono válido (9-12 dígitos)."
+                } else if (telefono.length < 9) {
+                    telefonoError = "El teléfono debe tener al menos 9 dígitos."
                     hasError = true
                 }
                 
@@ -261,17 +414,25 @@ fun RegisterScreen(navController: NavController) {
                 
                 // Validar confirmación de contraseña
                 if (confirmPassword.isBlank()) {
-                    confirmPasswordError = "Debes confirmar tu contraseña."
+                    confirmPasswordError = "Debes verificar tu contraseña."
                     hasError = true
                 } else if (password != confirmPassword) {
                     confirmPasswordError = "Las contraseñas no coinciden."
                     hasError = true
                 }
                 
-                // Si no hay errores, navegar de vuelta
+                // Si no hay errores, procesar registro
                 if (!hasError) {
-                    // Aquí podrías guardar el usuario en una base de datos o SharedPreferences
-                    navController.popBackStack()
+                    // Llamar al ViewModel para registrar el usuario
+                    viewModel.registerUser(
+                        run = run,
+                        dv = dv,
+                        nombres = nombres,
+                        apellidos = apellidos,
+                        email = email,
+                        telefono = telefono,
+                        password = password
+                    )
                 }
             },
             modifier = Modifier
@@ -307,6 +468,73 @@ fun RegisterScreen(navController: NavController) {
         
         Spacer(modifier = Modifier.height(32.dp))
     }
+    
+    // Loading indicator
+    if (registerState is RegisterState.Loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = Color(0xFF8E9B6B))
+        }
+    }
+    
+    // Dialog de éxito o error
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+                viewModel.resetState()
+                if (isSuccess) {
+                    navController.popBackStack()
+                }
+            },
+            title = {
+                Text(
+                    text = if (isSuccess) "¡Éxito!" else "Error",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(text = dialogMessage)
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                        viewModel.resetState()
+                        if (isSuccess) {
+                            navController.popBackStack()
+                        }
+                    }
+                ) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
+}
+
+// Función para calcular el dígito verificador del RUN chileno
+fun calculateDV(run: String): String {
+    var sum = 0
+    var multiplier = 2
+    
+    // Recorrer el RUN de derecha a izquierda
+    for (i in run.length - 1 downTo 0) {
+        sum += run[i].toString().toInt() * multiplier
+        multiplier = if (multiplier == 7) 2 else multiplier + 1
+    }
+    
+    val remainder = 11 - (sum % 11)
+    
+    return when (remainder) {
+        11 -> "0"
+        10 -> "K"
+        else -> remainder.toString()
+    }
 }
 
 @Composable
@@ -317,7 +545,8 @@ fun RegisterOutlinedTextField(
     icon: ImageVector,
     isPassword: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
-    isError: Boolean = false
+    isError: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -352,6 +581,7 @@ fun RegisterOutlinedTextField(
             }
         },
         isError = isError,
-        modifier = Modifier.fillMaxWidth()
+        singleLine = true,
+        modifier = modifier.fillMaxWidth()
     )
 }
